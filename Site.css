@@ -1,5 +1,7 @@
 body {
     font-family: "Audiowide", sans-serif;
+    color: white;
+    background-color: #3d4546;
 }
 
 /* Remove default bullets */
@@ -40,6 +42,11 @@ ul, #treeView {
 /* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
 .active {
     display: block;
+}
+
+.bar {
+    overflow: visible;
+    text-wrap: none;
 }
 
 .bar-duration {

@@ -93,7 +93,7 @@ function parseXmlToTreeView(
             if (!totalTime) totalTime = duration;
             let percentOfTotalTime = (duration / totalTime * 100);
 
-            durationBar = '<div class="bar-duration" style="width: '+percentOfTotalTime+'%">'+xmlNode.attributes["duration"].value+'</div>';
+            durationBar = '<div class="bar bar-duration" style="width: '+percentOfTotalTime+'%">'+xmlNode.attributes["duration"].value+'</div>';
         }
 
         let countBar = '';
@@ -103,7 +103,7 @@ function parseXmlToTreeView(
             if (!totalCount) totalCount = count;
             let percentOfTotalCount = (count / totalCount * 100);
 
-            countBar = '<div class="bar-count" style="width: '+percentOfTotalCount+'%">'+xmlNode.attributes["testcasecount"].value+'</div>';
+            countBar = '<div class="bar bar-count" style="width: '+percentOfTotalCount+'%">'+xmlNode.attributes["testcasecount"].value+'</div>';
         }
 
         let assertsBar = '';
@@ -113,7 +113,7 @@ function parseXmlToTreeView(
             if (!totalAsserts) totalAsserts = count;
             let percentOfTotalAsserts = (count / totalAsserts * 100);
 
-            assertsBar = '<div class="bar-avg" style="width: ' + percentOfTotalAsserts + '%">' + xmlNode.attributes["asserts"].value + '</div>';
+            assertsBar = '<div class="bar bar-avg" style="width: ' + percentOfTotalAsserts + '%">' + xmlNode.attributes["asserts"].value + '</div>';
         }
 
         let avgBar = '';
@@ -124,7 +124,7 @@ function parseXmlToTreeView(
             if (count) {
                 let avg = milliseconds / count;
                 let percentOfMaxAvg = (avg / maxAvg * 100);
-                avgBar = '<div class="bar-avg" style="width: ' + percentOfMaxAvg + '%">' + avg.toFixed(1)+ ' ms</div>';
+                avgBar = '<div class="bar-avg" style="width: ' + percentOfMaxAvg + '%">' + avg.toFixed(1)+ 'ms</div>';
             }
         }
 
