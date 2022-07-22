@@ -20,8 +20,6 @@ function calcMaxAvg(
     dom,
     arrayTags) {
 
-    let maxAvg = 0.0;
-
     function parseNode(xmlNode, result) {
 
         if (arrayTags && arrayTags.indexOf(xmlNode.nodeName) === -1) {
@@ -34,22 +32,23 @@ function calcMaxAvg(
         }
 
         if (xmlNode.attributes && xmlNode.attributes["duration"] && xmlNode.attributes["testcasecount"]) {
-            let duration = parseFloat(xmlNode.attributes["duration"].value);
+            let duration = parseFloat(xmlNode.attributes["duration"].value)* 1000;
             let count = parseFloat(xmlNode.attributes["testcasecount"].value);
             if (count) {
-                let avg = (duration * 1000) / count;
-                if (avg > maxAvg) {
-                    maxAvg = avg;
+                let avg = duration / count;
+                if (avg > result.maxAvg) {
+                    result.maxAvg = avg;
                 }
             }
         }
-
-        result.maxAvg = maxAvg;
+        for (let node of xmlNode.childNodes) parseNode(node, result);
     }
 
     let result = { maxAvg: 0.0 };
-    for (let node of dom.childNodes) parseNode(node, result);
-
+    for (let node of dom.childNodes) {
+        parseNode(node, result);
+    }
+    console.log(result.maxAvg);
     return result.maxAvg;
 }
 
@@ -109,7 +108,7 @@ function parseXmlToTreeView(
 
         let assertsBar = '';
         if (showAsserts && xmlNode.attributes && xmlNode.attributes["asserts"] && xmlNode.attributes["duration"]) {
-            let count = parseFloat(xmlNode.attributes["testcasecount"].value);
+            let count = parseFloat(xmlNode.attributes["asserts"].value);
 
             if (!totalAsserts) totalAsserts = count;
             let percentOfTotalAsserts = (count / totalAsserts * 100);
