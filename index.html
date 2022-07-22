@@ -2,67 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Display NUnit Test Results</title>
+    <title>Visualise NUnit Test Results</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide">
+    <link rel="stylesheet" type="text/css" href="Site.css" />
+    <script type="text/javascript" src="VisualiseXML.js"></script>
 </head>
-<style>
-    /* Remove default bullets */
-    ul, #treeView {
-        list-style-type: none;
-    }
-
-    /* Remove margins and padding from the parent ul */
-    #treeView {
-        margin: 0;
-        padding: 0;
-    }
-
-    /* Style the caret/arrow */
-    .caret {
-        cursor: pointer;
-        user-select: none; /* Prevent text selection */
-    }
-
-    /* Create the caret/arrow with a unicode, and style it */
-    .caret::before {
-        content: "\25B6";
-        color: black;
-        display: inline-block;
-        margin-right: 6px;
-    }
-
-    /* Rotate the caret/arrow icon when clicked on (using JavaScript) */
-    .caret-down::before {
-        transform: rotate(90deg);
-    }
-
-    /* Hide the nested list */
-    .nested {
-        display: none;
-    }
-
-    /* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
-    .active {
-        display: block;
-    }
-
-    .bar-duration {
-        color: white;
-        background: DarkBlue;
-    }
-
-
-</style>
-
 <body>
 <table width='100%'>
     <tr>
         <td valign='top'>
-					<textarea id='code' onchange='renderDisplay(this.value)' style='width:100%; height:400px;'>
+					<textarea id='code' onchange='renderDisplay(this.value, ALL_TESTS)' style='width:100%; height:400px;'>
 // Paste the contents of the TestResults.XML file here and press render
 					</textarea>
             <br/>
             <button onclick="renderDisplay(document.getElementById('code').value)" style="padding:10px; margin-top:20px;">Render All</button>
-            <button onclick="renderDisplay(document.getElementById('code').value, ['test-run', 'test-suite', 'test-case'])" style="padding:10px; margin-top:20px;">Render Test Suite</button>
+            <label><input type="checkbox" id="showDuration" checked>Show Duration</label>
+            <label><input type="checkbox" id="showCount" >Show Count</label>
+            <label><input type="checkbox" id="showAsserts" >Show Asserts</label>
+            <label><input type="checkbox" id="showAvgTime" >Show Avg Time</label>
+            <button onclick="renderDisplay(document.getElementById('code').value, ALL_TESTS)" style="padding:10px; margin-top:20px;">Render Test Suite</button>
         </td>
     </tr>
 </table>
@@ -74,115 +32,16 @@
 
 <script type='text/javascript'>
 
-    function parseXmlToJson(xml, arrayTags) {
-        let dom = null;
-        if (window.DOMParser) dom = (new DOMParser()).parseFromString(xml, "text/xml");
-        else if (window.ActiveXObject) {
-            dom = new ActiveXObject('Microsoft.XMLDOM');
-            dom.async = false;
-            if (!dom.loadXML(xml)) throw dom.parseError.reason + " " + dom.parseError.srcText;
-        }
-        else throw new Error("cannot parse xml string!");
-
-        function parseNode(xmlNode, result) {
-
-            if (xmlNode.nodeName === "#text") {
-                let v = xmlNode.nodeValue;
-                if (v.trim()) result['#text'] = v;
-                return;
-            }
-
-            let jsonNode = {}, existing = result[xmlNode.nodeName];
-            if (existing) {
-                if (!Array.isArray(existing)) result[xmlNode.nodeName] = [existing, jsonNode];
-                else result[xmlNode.nodeName].push(jsonNode);
-            }
-            else {
-                if (arrayTags && arrayTags.indexOf(xmlNode.nodeName) !== -1) result[xmlNode.nodeName] = [jsonNode];
-                else result[xmlNode.nodeName] = jsonNode;
-            }
-
-            if (xmlNode.attributes) for (let attribute of xmlNode.attributes) jsonNode[attribute.nodeName] = attribute.nodeValue;
-
-            for (let node of xmlNode.childNodes) parseNode(node, jsonNode);
-        }
-
-        let result = {};
-        for (let node of dom.childNodes) parseNode(node, result);
-
-        return result;
-    }
-
-    function parseXmlToTreeView(xml, arrayTags) {
-        let dom = null;
-        let totalTime = null;
-        if (window.DOMParser) dom = (new DOMParser()).parseFromString(xml, "text/xml");
-        else if (window.ActiveXObject) {
-            dom = new ActiveXObject('Microsoft.XMLDOM');
-            dom.async = false;
-            if (!dom.loadXML(xml)) throw dom.parseError.reason + " " + dom.parseError.srcText;
-        }
-        else throw new Error("cannot parse xml string!");
-
-        function parseNode(xmlNode, result) {
-
-            if (arrayTags && arrayTags.indexOf(xmlNode.nodeName) === -1) {
-                return;
-            }
-
-            result.str += '<li><span class="caret">';
-            if (xmlNode.nodeName === "#text") {
-                let v = xmlNode.nodeValue;
-                if (v.trim()) result.str += v;
-                result.str += '</span></li>';
-                return;
-            }
-
-            let bar = '';
-            if (xmlNode.attributes && xmlNode.attributes["duration"]) {
-                let duration = parseFloat(xmlNode.attributes["duration"].value);
-                if (!totalTime) totalTime = duration;
-                let percentOfTotalTime = (duration / totalTime * 100);
-
-                bar = '<div class="bar-duration" style="width: '+percentOfTotalTime+'%">'+xmlNode.attributes["duration"].value+'</div>';
-            }
-
-            result.str += xmlNode.nodeName + ': ' + (xmlNode.attributes && xmlNode.attributes["name"] ? xmlNode.attributes["name"].value : '') + bar +  '</span>';
-
-            /*if (xmlNode.attributes) {
-              for (let attribute of xmlNode.attributes) {
-                result.str += "<br/>" + attribute.nodeName + ": " + attribute.nodeValue;
-              }
-            }*/
-
-            result.str += '<ul class="nested">';
-            for (let node of xmlNode.childNodes) parseNode(node, result);
-            result.str += '</ul></li>';
-        }
-
-        let result = { str: '<ul>' };
-        for (let node of dom.childNodes) parseNode(node, result);
-        result.str += '</ul>';
-
-        if (result.str === "<ul></ul>") {
-            return "";
-        }
-        return result.str;
-    }
-
-    function linkToggleToTreeView() {
-        let toggler = document.getElementsByClassName("caret");
-
-        for (let i = 0; i < toggler.length; i++) {
-            toggler[i].addEventListener("click", function() {
-                this.parentElement.querySelector(".nested").classList.toggle("active");
-                this.classList.toggle("caret-down");
-            });
-        }
-    }
-
-   function renderDisplay(value, arrayTags) {
-       document.getElementById('treeView').innerHTML = parseXmlToTreeView(value, arrayTags);
+   function renderDisplay(
+       value,
+       arrayTags) {
+       document.getElementById('treeView').innerHTML = parseXmlToTreeView(
+           value,
+           arrayTags,
+           document.getElementById('showDuration').checked,
+           document.getElementById('showCount').checked,
+           document.getElementById('showAsserts').checked,
+           document.getElementById('showAvgTime').checked);
        linkToggleToTreeView();
    }
 </script>
