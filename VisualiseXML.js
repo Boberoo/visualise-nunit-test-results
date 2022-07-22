@@ -1,5 +1,58 @@
 const ALL_TESTS = ['test-run', 'test-suite', 'test-case'];
 
+function CreateDomParser(xml) {
+    if (window.DOMParser) {
+        return (new DOMParser()).parseFromString(xml, "text/xml");
+    }
+    else if (window.ActiveXObject) {
+        let dom = new ActiveXObject('Microsoft.XMLDOM');
+        dom.async = false;
+        if (!dom.loadXML(xml)) {
+            throw dom.parseError.reason + " " + dom.parseError.srcText;
+        }
+        return dom;
+    } else {
+        throw new Error("cannot parse xml string!");
+    }
+}
+
+function calcMaxAvg(
+    dom,
+    arrayTags) {
+
+    let maxAvg = 0.0;
+
+    function parseNode(xmlNode, result) {
+
+        if (arrayTags && arrayTags.indexOf(xmlNode.nodeName) === -1) {
+            return;
+        }
+
+        if (xmlNode.nodeName === "#text") {
+
+            return;
+        }
+
+        if (xmlNode.attributes && xmlNode.attributes["duration"] && xmlNode.attributes["testcasecount"]) {
+            let duration = parseFloat(xmlNode.attributes["duration"].value);
+            let count = parseFloat(xmlNode.attributes["testcasecount"].value);
+            if (count) {
+                let avg = (duration * 1000) / count;
+                if (avg > maxAvg) {
+                    maxAvg = avg;
+                }
+            }
+        }
+
+        result.maxAvg = maxAvg;
+    }
+
+    let result = { maxAvg: 0.0 };
+    for (let node of dom.childNodes) parseNode(node, result);
+
+    return result.maxAvg;
+}
+
 function parseXmlToTreeView(
     xml,
     arrayTags,
@@ -7,17 +60,18 @@ function parseXmlToTreeView(
     showCount = false,
     showAsserts = false,
     showAvgTime = false) {
-    let dom = null;
     let totalTime = null;
     let totalCount = null;
     let totalAsserts = null;
-    if (window.DOMParser) dom = (new DOMParser()).parseFromString(xml, "text/xml");
-    else if (window.ActiveXObject) {
-        dom = new ActiveXObject('Microsoft.XMLDOM');
-        dom.async = false;
-        if (!dom.loadXML(xml)) throw dom.parseError.reason + " " + dom.parseError.srcText;
+    let maxAvg = null;
+
+    let dom = CreateDomParser(xml);
+
+    if (showAvgTime) {
+        maxAvg = calcMaxAvg(
+            dom,
+            arrayTags);
     }
-    else throw new Error("cannot parse xml string!");
 
     function parseNode(xmlNode, result) {
 
@@ -54,17 +108,29 @@ function parseXmlToTreeView(
         }
 
         let assertsBar = '';
-        if (showAsserts && xmlNode.attributes && xmlNode.attributes["asserts"]) {
-            let count = parseFloat(xmlNode.attributes["asserts"].value);
+        if (showAsserts && xmlNode.attributes && xmlNode.attributes["asserts"] && xmlNode.attributes["duration"]) {
+            let count = parseFloat(xmlNode.attributes["testcasecount"].value);
 
             if (!totalAsserts) totalAsserts = count;
             let percentOfTotalAsserts = (count / totalAsserts * 100);
 
-            assertsBar = '<div class="bar-count-asserts" style="width: '+percentOfTotalAsserts+'%">'+xmlNode.attributes["asserts"].value+'</div>';
+            assertsBar = '<div class="bar-avg" style="width: ' + percentOfTotalAsserts + '%">' + xmlNode.attributes["asserts"].value + '</div>';
+        }
+
+        let avgBar = '';
+        if (showAvgTime && xmlNode.attributes && xmlNode.attributes["testcasecount"] && xmlNode.attributes["duration"]) {
+
+            let count = parseFloat(xmlNode.attributes["testcasecount"].value);
+            let milliseconds = parseFloat(xmlNode.attributes["duration"].value) * 1000;
+            if (count) {
+                let avg = milliseconds / count;
+                let percentOfMaxAvg = (avg / maxAvg * 100);
+                avgBar = '<div class="bar-avg" style="width: ' + percentOfMaxAvg + '%">' + avg.toFixed(1)+ ' ms</div>';
+            }
         }
 
         result.str += xmlNode.nodeName + ': ' + (xmlNode.attributes && xmlNode.attributes["name"] ? xmlNode.attributes["name"].value : '')
-        result.str += durationBar + countBar + assertsBar+  '</span>';
+        result.str += durationBar + countBar + assertsBar + avgBar + '</span>';
 
         /*if (xmlNode.attributes) {
           for (let attribute of xmlNode.attributes) {
