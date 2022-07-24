@@ -89,3 +89,7 @@ ul, #treeView {
 .btn-primary {
     background-color: #008CBA;
 }
+
+a:visited {
+    color: lightgrey;
+}
