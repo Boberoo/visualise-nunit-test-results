@@ -17,10 +17,10 @@
             <br/>
             <button hidden onclick="renderDisplay(document.getElementById('code').value)" style="padding:10px; margin-top:20px;">Render All</button>
             <button onclick="pasteXML()" style="padding:10px; margin-top:20px;">Paste XML</button>
-            <label><input type="checkbox" id="showDuration" checked>Show Duration</label>
-            <label><input type="checkbox" id="showCount" >Show Count</label>
-            <label><input type="checkbox" id="showAsserts" >Show Asserts</label>
-            <label><input type="checkbox" id="showAvgTime" >Show Avg Time</label>
+            <label class="bar-duration"><input type="checkbox" id="showDuration" checked>Show Duration</label>
+            <label class="bar-count"><input type="checkbox" id="showCount" >Show Count</label>
+            <label class="bar-count-asserts"><input type="checkbox" id="showAsserts" >Show Asserts</label>
+            <label class="bar-avg"><input type="checkbox" id="showAvgTime" >Show Avg Time</label>
             <button onclick="renderDisplay(document.getElementById('code').value, ALL_TESTS)" style="padding:10px; margin-top:20px;">Refresh</button>
             <button onclick="expandAll()" style="padding:10px; margin-top:20px;">Expand All</button>
         </td>
