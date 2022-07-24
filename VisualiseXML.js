@@ -113,7 +113,7 @@ function parseXmlToTreeView(
             if (!totalAsserts) totalAsserts = count;
             let percentOfTotalAsserts = (count / totalAsserts * 100);
 
-            assertsBar = '<div class="bar bar-avg" style="width: ' + percentOfTotalAsserts + '%">' + xmlNode.attributes["asserts"].value + '</div>';
+            assertsBar = '<div class="bar bar-count-asserts" style="width: ' + percentOfTotalAsserts + '%">' + xmlNode.attributes["asserts"].value + '</div>';
         }
 
         let avgBar = '';
