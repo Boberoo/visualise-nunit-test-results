@@ -131,7 +131,7 @@ function parseXmlToTreeView(
         result.str += xmlNode.nodeName + ': ' + (xmlNode.attributes && xmlNode.attributes["name"] ? xmlNode.attributes["name"].value : '')
         result.str += durationBar + countBar + assertsBar + avgBar + '</span>';
 
-        /*if (xmlNode.attributes) {
+        /*DEBUG if (xmlNode.attributes) {
           for (let attribute of xmlNode.attributes) {
             result.str += "<br/>" + attribute.nodeName + ": " + attribute.nodeValue;
           }
@@ -160,5 +160,14 @@ function linkToggleToTreeView() {
             this.parentElement.querySelector(".nested").classList.toggle("active");
             this.classList.toggle("caret-down");
         });
+    }
+}
+
+function expandAll() {
+    let carets = document.getElementsByClassName("caret");
+
+    for (let caret of carets) {
+        caret.parentElement.querySelector(".nested").classList.add("active");
+        caret.classList.add("caret-down");
     }
 }
