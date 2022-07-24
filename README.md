@@ -1,37 +1,33 @@
-## Welcome to GitHub Pages
+## NUnit test results visualiser
 
-You can use the [editor on GitHub](https://github.com/Boberoo/visualise-nunit-test-results/edit/main/README.md) to maintain and preview the content for your website in Markdown files.
+You can use this app on [GitHub Pages](https://boberoo.github.io/visualise-nunit-test-results/), or you can download the source and run it locally in your browser.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Pre-requisites
 
-### Markdown
+Written in vanilla HTML/CSS/JavaScript, there are no dependencies in the source. You will however need a command line tool for running the unit tests to produce the TestResults in XML format.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### Generating the TestResults.XML file for your C# project
 
-```markdown
-Syntax highlighted code block
+**Visual Studio** installs a command line tool called `MSTest`, and **dotnet core** can use the `dotnet test` command, but if you are using **Rider** you'll need to download a free tool, like [NUnit3 Console available on the NUnit downloads page](https://nunit.org/download/)
 
-# Header 1
-## Header 2
-### Header 3
+Sample Windows command that can be saved in a batch file to be re-run easily:
 
-- Bulleted
-- List
+```
+cd "C:\My Dev Folder\The Company\The Project\TheProject.Tests\bin\Debug\"
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+"C:\Program Files (x86)\NUnit.org\nunit-console\nunit3-console.exe" TheProject.Tests.dll --work=c:\Temp\6
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+This will place a file called `TestResults.XML` into `c:\Temp\`
 
-### Jekyll Themes
+### Usage
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Boberoo/visualise-nunit-test-results/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+Copy and paste the contents of `TestResults.XML` into the memo of the visualiser app.
 
-### Support or Contact
+Tick the corresponding box if you would like to see
+- Duration
+- Number of Tests
+- Number of Assertions
+- Avg Test Duration
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+The visual representation makes it easier to spot tests that are significantly slower than the others for the amount of tests they are doing.
