@@ -15,14 +15,14 @@
 // Paste the contents of the TestResults.XML file here, select your options, then press 'Refresh'
 					</textarea>
             <br/>
-            <button hidden onclick="renderDisplay(document.getElementById('code').value)" style="padding:10px; margin-top:20px;">Render All</button>
-            <button class="btn btn-primary" onclick="pasteXML()" style="padding:10px; margin-top:20px;">Paste XML</button>
+            <button hidden onclick="renderDisplay(document.getElementById('code').value)">Render All</button>
+            <button class="btn btn-primary" onclick="pasteXML()">Paste XML</button>
             <label class="bar-duration"><input type="checkbox" id="showDuration" checked>Show Duration</label>
             <label class="bar-count"><input type="checkbox" id="showCount" >Show Count</label>
             <label class="bar-count-asserts"><input type="checkbox" id="showAsserts" >Show Asserts</label>
             <label class="bar-avg"><input type="checkbox" id="showAvgTime" >Show Avg Time</label>
-            <button class="btn btn-primary" onclick="renderDisplay(document.getElementById('code').value, ALL_TESTS)" style="padding:10px; margin-top:20px;">Refresh</button>
-            <button class="btn btn-primary" onclick="expandAll()" style="padding:10px; margin-top:20px;">Expand All</button>
+            <button class="btn btn-primary" onclick="renderDisplay(document.getElementById('code').value, ALL_TESTS)">Refresh</button>
+            <button class="btn btn-primary" onclick="expandAll()">Expand All</button>
         </td>
     </tr>
 </table>
