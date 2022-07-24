@@ -93,7 +93,7 @@ function parseXmlToTreeView(
             if (!totalTime) totalTime = duration;
             let percentOfTotalTime = (duration / totalTime * 100);
 
-            durationBar = '<div class="bar bar-duration" style="width: '+percentOfTotalTime+'%">'+xmlNode.attributes["duration"].value+'</div>';
+            durationBar = '<div class="bar bar-duration" style="width: '+percentOfTotalTime+'%">'+(duration > 2 ? duration.toFixed(1) : duration)+'s</div>';
         }
 
         let countBar = '';
@@ -107,7 +107,7 @@ function parseXmlToTreeView(
         }
 
         let assertsBar = '';
-        if (showAsserts && xmlNode.attributes && xmlNode.attributes["asserts"] && xmlNode.attributes["duration"]) {
+        if (showAsserts && xmlNode.attributes && xmlNode.attributes["asserts"]) {
             let count = parseFloat(xmlNode.attributes["asserts"].value);
 
             if (!totalAsserts) totalAsserts = count;

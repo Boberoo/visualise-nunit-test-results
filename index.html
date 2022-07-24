@@ -16,6 +16,7 @@
 					</textarea>
             <br/>
             <button hidden onclick="renderDisplay(document.getElementById('code').value)" style="padding:10px; margin-top:20px;">Render All</button>
+            <button onclick="pasteXML()" style="padding:10px; margin-top:20px;">Paste XML</button>
             <label><input type="checkbox" id="showDuration" checked>Show Duration</label>
             <label><input type="checkbox" id="showCount" >Show Count</label>
             <label><input type="checkbox" id="showAsserts" >Show Asserts</label>
@@ -38,12 +39,20 @@
        arrayTags) {
        document.getElementById('treeView').innerHTML = parseXmlToTreeView(
            value,
-           arrayTags,
+           arrayTags = ALL_TESTS,
            document.getElementById('showDuration').checked,
            document.getElementById('showCount').checked,
            document.getElementById('showAsserts').checked,
            document.getElementById('showAvgTime').checked);
        linkToggleToTreeView();
+   }
+
+   function pasteXML() {
+       navigator.clipboard.readText().then(value => {
+           let xmlInput = document.getElementById('code');
+           xmlInput.value = value;
+           renderDisplay(value);
+       });
    }
 </script>
 
