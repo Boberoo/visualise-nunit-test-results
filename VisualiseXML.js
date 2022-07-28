@@ -52,6 +52,34 @@ function calcMaxAvg(
     return result.maxAvg;
 }
 
+function escapeHTML(str){
+    return new Option(str).innerHTML;
+}
+
+function formatDuration(timeInSeconds){
+    let milliseconds = timeInSeconds * 1000;
+    let duration = "";
+    let hours = Math.floor(milliseconds/(1000*60*60));
+    if (hours > 0)
+       duration += hours+"hours"
+    milliseconds = milliseconds - (hours * (1000*60*60));
+    let minutes = Math.floor(milliseconds/(1000*60));
+    if (minutes > 0)
+        duration += minutes+"mins"
+    milliseconds = milliseconds - (minutes * (1000*60));
+    let seconds = (milliseconds/(1000));
+    if (seconds > 0)
+        duration += seconds.toFixed(1)+"s";
+
+    if ((hours+minutes+seconds) > 0)
+      return duration;
+
+    milliseconds = milliseconds - (seconds * (1000));
+    duration += (milliseconds > 2 ? milliseconds.toFixed(1) : milliseconds)+"ms";
+    return duration;
+}
+
+
 function parseXmlToTreeView(
     xml,
     arrayTags,
@@ -93,7 +121,7 @@ function parseXmlToTreeView(
             if (!totalTime) totalTime = duration;
             let percentOfTotalTime = (duration / totalTime * 100);
 
-            durationBar = '<div class="bar bar-duration" style="width: '+percentOfTotalTime+'%">'+(duration > 2 ? duration.toFixed(1) : duration)+'s</div>';
+            durationBar = '<div class="bar bar-duration" style="width: '+percentOfTotalTime+'%">'+formatDuration(duration)+'</div>';
         }
 
         let countBar = '';
@@ -117,18 +145,21 @@ function parseXmlToTreeView(
         }
 
         let avgBar = '';
-        if (showAvgTime && xmlNode.attributes && xmlNode.attributes["testcasecount"] && xmlNode.attributes["duration"]) {
+        if (showAvgTime && xmlNode.attributes && xmlNode.attributes["duration"]) {
+            let count = 1;
+            if (xmlNode.attributes["testcasecount"]) {
+                count = parseFloat(xmlNode.attributes["testcasecount"].value);
+            }
 
-            let count = parseFloat(xmlNode.attributes["testcasecount"].value);
             let milliseconds = parseFloat(xmlNode.attributes["duration"].value) * 1000;
             if (count) {
                 let avg = milliseconds / count;
                 let percentOfMaxAvg = (avg / maxAvg * 100);
-                avgBar = '<div class="bar-avg" style="width: ' + percentOfMaxAvg + '%">' + avg.toFixed(1)+ 'ms</div>';
+                avgBar = '<div class="bar-avg" style="width: ' + percentOfMaxAvg + '%">' + formatDuration(avg/1000)+'</div>';
             }
         }
 
-        result.str += xmlNode.nodeName + ': ' + (xmlNode.attributes && xmlNode.attributes["name"] ? xmlNode.attributes["name"].value : '')
+        result.str += escapeHTML(xmlNode.nodeName + ': ' + (xmlNode.attributes && xmlNode.attributes["name"] ? xmlNode.attributes["name"].value : ''));
         result.str += durationBar + countBar + assertsBar + avgBar + '</span>';
 
         /*DEBUG if (xmlNode.attributes) {
